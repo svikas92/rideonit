@@ -7,7 +7,7 @@ const EventEmitter = require('events');
 router.post("/list", async (req, res) => {
 	const rides = await Ride.find()
 		.select("-__v")
-		.sort("end_at");
+		.sort("booked_at");
 	res.send(rides);
 });
 
