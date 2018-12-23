@@ -126,7 +126,7 @@
 			elem = $(elem);
 			const ride_id = elem.attr('id').split('_')[1];
 			const driver_id = $('#driver_id').text();
-			const url = `http://localhost:8080/api/rides/${ride_id}/start`;
+			const url = `https://guarded-river-90777.herokuapp.com/api/rides/${ride_id}/start`;
 
 			// Send the data using post
 			$.ajax({
