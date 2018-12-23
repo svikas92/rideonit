@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<!-- Required meta tags -->
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<!-- Bootstrap CSS -->
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+	 crossorigin="anonymous">
+
+	<title>Driver App!</title>
+</head>
+
+<body>
+	<div class="container-fluid">
+		<table class="table">
+			<thead>
+				<tr>
+					<th scope="col">Waiting</th>
+					<th scope="col">Ongoing</th>
+					<th scope="col">Complete</th>
+				</tr>
+			</thead>
+			<tbody>
+				<% const waiting = rides.waiting %>
+				<% const ongoing = rides.ongoing %>
+				<% const complete = rides.complete %>
+				<div hidden id="driver_id">
+					<%= driver_id %>
+				</div>
+				<tr>
+					<td>
+						<% for(var i=0; i < waiting.length; i++) { %>
+						<% const now = new Date(Date.now()) %>
+						<% const booked_at = new Date(waiting[i].booked_at) %>
+						<% const diff = dateDiff(booked_at, now) %>
+						<div class="card">
+							<div class="card-body">
+								<h6 class="card-subtitle mb-2">Ride Id -
+									<%= waiting[i]._id %>
+								</h6>
+								<h6 class="mb-2 text-muted">Customer Id -
+									<%= waiting[i].customer_id %>
+								</h6>
+								<h6 class="card-subtitle mb-2 text-muted">
+									<%= diff + ' ago' %>
+								</h6>
+								<button onclick="selectRide(this)" type="button" class="btn btn-primary card-link" id="ride_<%= waiting[i]._id %>">Select</button>
+							</div>
+						</div>
+						<% } %>
+					</td>
+					<td>
+						<% for(var i=0; i < ongoing.length; i++) { %>
+						<% const now = new Date(Date.now()) %>
+						<% const booked_at = new Date(ongoing[i].booked_at) %>
+						<% const started_at = new Date(ongoing[i].started_at) %>
+						<% const diffBook = dateDiff(booked_at, now) %>
+						<% const diffPickup = dateDiff(started_at, now) %>
+						<div class="card">
+							<div class="card-body">
+								<h6 class="card-subtitle mb-2">Ride Id -
+									<%= ongoing[i]._id %>
+								</h6>
+								<h6 class="mb-2 text-muted">Customer Id -
+									<%= ongoing[i].customer_id %>
+								</h6>
+								<h6 class="card-subtitle mb-2 text-muted">Booked -
+									<%= diffBook + ' ago' %>
+								</h6>
+								<h6 class="card-subtitle mb-2 text-muted">Picked -
+									<%= diffPickup + ' ago' %>
+								</h6>
+							</div>
+						</div>
+						<% } %>
+					</td>
+					<td>
+						<% for(var i=0; i < complete.length; i++) { %>
+						<% const now = new Date(Date.now()) %>
+						<% const booked_at = new Date(complete[i].booked_at) %>
+						<% const started_at = new Date(complete[i].started_at) %>
+						<% const end_at = new Date(complete[i].end_at) %>
+						<% const diffBook = dateDiff(booked_at, now) %>
+						<% const diffPickup = dateDiff(started_at, now) %>
+						<% const diffEnd = dateDiff(end_at, now) %>
+						<div class="card">
+							<div class="card-body">
+								<h6 class="card-subtitle mb-2">Ride Id -
+									<%= complete[i]._id %>
+								</h6>
+								<h6 class="mb-2 text-muted">Customer Id -
+									<%= complete[i].customer_id %>
+								</h6>
+								<h6 class="card-subtitle mb-2 text-muted">Booked -
+									<%= diffBook + ' ago' %>
+								</h6>
+								<h6 class="card-subtitle mb-2 text-muted">Picked -
+									<%= diffPickup + ' ago' %>
+								</h6>
+								<h6 class="card-subtitle mb-2 text-muted">Completed -
+									<%= diffEnd + ' ago' %>
+								</h6>
+							</div>
+						</div>
+						<% } %>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<!-- Optional JavaScript -->
+	<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+	 crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+	 crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+	 crossorigin="anonymous"></script>
+
+	<script>
+		function selectRide(elem) {
+			elem = $(elem);
+			const ride_id = elem.attr('id').split('_')[1];
+			const driver_id = $('#driver_id').text();
+			const url = `http://localhost:8080/api/rides/${ride_id}/start`;
+
+			// Send the data using post
+			$.ajax({
+				type: 'POST',
+				url: url,
+				data: { driver_id: driver_id },
+				async: true,
+				success: function (data, status, xhr) {
+					if (xhr.status === 400)
+						alert('ride is already booked');
+
+					if (xhr.status === 200) {
+						alert('ride booked successfully');
+						$(location.reload());
+					}
+				}
+			});
+		}
+	</script>
+</body>
+
+</html>
