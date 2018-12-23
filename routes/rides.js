@@ -1,6 +1,7 @@
 const Ride = require("../models/ride");
 const express = require("express");
 const router = express.Router();
+const moment = require('moment');
 const EventEmitter = require('events');
 
 router.post("/list", async (req, res) => {
@@ -33,11 +34,11 @@ router.post('/:ride_id/start', async (req, res) => {
 	ride.start(driver_id);
 	await ride.save();
 
-	const begin = setTimeout(async () => {
-		ride.stop();
-		await ride.save();
-		clearTimeout(begin);
-	}, 5 * 60 * 1000);
+	// const begin = setTimeout(async () => {
+	// 	ride.stop();
+	// 	await ride.save();
+	// 	clearTimeout(begin);
+	// }, 5 * 60 * 1000);
 
 	res.sendStatus(200);
 });
